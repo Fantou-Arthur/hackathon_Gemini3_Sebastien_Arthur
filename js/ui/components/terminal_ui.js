@@ -6,7 +6,8 @@ export function getTerminalMarkup() {
             <textarea id="promptInput" rows="3" placeholder="Ex: Crée une scène..."></textarea>
             <button id="generateBtn">Nouveau Monde</button>
             <button id="addBtn" style="margin-top: 5px; background: #2c3e50; color: #ecf0f1; border: 1px solid #ecf0f1; padding: 10px; width: 100%; font-family: 'JetBrains Mono', monospace; cursor: pointer; border-radius: 4px; font-weight: bold; text-transform: uppercase; transition: all 0.2s;">Ajouter à la scène</button>
-            <button id="toggleIABtn" style="margin-top: 5px; background: #333; color: #0f0; border: 1px solid #0f0; padding: 5px; width: 100%; font-family: monospace; cursor: pointer;">IA : ON</button>
+            <button id="toggleIABtn" style="margin-top: 5px; background: #333; color: #0f0; border: 1px solid #0f0; padding: 5px; width: 100%; font-family: monospace; cursor: pointer;">IA GENERATION : ON</button>
+            <button id="toggleGeminiBtn" style="margin-top: 5px; background: #4285f4; color: #fff; border: 1px solid #fff; padding: 5px; width: 100%; font-family: monospace; cursor: pointer;">GEMINI AGENT : ON</button>
             <div id="status">Chargement du système...</div>
         </div>
         <div id="gemini-chat-panel" style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">

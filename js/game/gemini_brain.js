@@ -1,6 +1,7 @@
 import { fetchGemini } from '../services/gemini_api.js';
 import { logToTerminal } from '../utils/logger.js';
 import { moveBot } from './bot_engine.js';
+import { CONFIG } from '../config.js';
 
 class GeminiAgent {
     constructor() {
@@ -8,12 +9,13 @@ class GeminiAgent {
         this.x = 0;
         this.y = 1.6;
         this.z = 2;
-        this.active = false;
+        this.active = false;      // Liaison à la génération du monde
+        this.enabled = true;      // Interrupteur manuel utilisateur
         this.history = [];
     }
 
     async think(context) {
-        if (!this.active) return;
+        if (!this.active || !this.enabled) return;
 
         const prompt = `Tu es Gemini, un agent IA vivant dans ce monde VR. 
         TON ÉTAT : Position X:${this.x.toFixed(2)}, Y:${this.y.toFixed(2)}, Z:${this.z.toFixed(2)}.
@@ -30,7 +32,7 @@ class GeminiAgent {
             const data = await fetchGemini({
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
                 generationConfig: { responseMimeType: "application/json", temperature: 0.7 }
-            });
+            }, CONFIG.AGENT_MODEL);
 
             const response = JSON.parse(data.candidates[0].content.parts[0].text);
             this.updateSpeechBubble(response.speech);
@@ -62,7 +64,7 @@ class GeminiAgent {
             const data = await fetchGemini({
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
                 generationConfig: { responseMimeType: "application/json" }
-            });
+            }, CONFIG.AGENT_MODEL);
             const response = JSON.parse(data.candidates[0].content.parts[0].text);
             this.updateSpeechBubble(response.speech);
             logToTerminal(`<span style="color: #4285f4; font-weight: bold;">Gemini :</span> ${response.speech}`);

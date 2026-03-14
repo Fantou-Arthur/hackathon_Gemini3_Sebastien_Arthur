@@ -1,5 +1,6 @@
 import { fetchGemini } from './gemini_api.js';
 import { logToTerminal } from '../utils/logger.js';
+import { CONFIG } from '../config.js';
 
 export async function callArchitect(userInput) {
     const systemPrompt = `Tu es un Architecte 3D Expert en A-Frame. L'utilisateur va te demander de créer ou d'ajouter des éléments au décor.
@@ -25,7 +26,7 @@ export async function callArchitect(userInput) {
 
     try {
         logToTerminal("L'Architecte analyse la demande...");
-        const data = await fetchGemini(payload);
+        const data = await fetchGemini(payload, CONFIG.ARCHITECT_MODEL);
         
         let jsonString = data.candidates[0].content.parts[0].text;
         jsonString = jsonString.replace(/```json/g, "").replace(/```/g, "").trim();

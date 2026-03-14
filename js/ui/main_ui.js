@@ -102,13 +102,27 @@ export async function initUI() {
     });
     addBtn.addEventListener("click", () => handleGeneration(true));
 
+    const toggleGeminiBtn = document.getElementById('toggleGeminiBtn');
+
     toggleIABtn.addEventListener('click', () => {
         const newState = !getIAEnabled();
         setIAEnabled(newState);
-        toggleIABtn.innerText = newState ? "IA : ON" : "IA : OFF";
+        toggleIABtn.innerText = newState ? "IA GENERATION : ON" : "IA GENERATION : OFF";
         toggleIABtn.style.color = newState ? "#0f0" : "#f00";
         toggleIABtn.style.borderColor = newState ? "#0f0" : "#f00";
-        logToTerminal(`IA ${newState ? 'activée' : 'désactivée'}.`);
+        logToTerminal(`IA de génération ${newState ? 'activée' : 'désactivée'}.`);
+    });
+
+    toggleGeminiBtn.addEventListener('click', () => {
+        geminiAgent.enabled = !geminiAgent.enabled;
+        toggleGeminiBtn.innerText = geminiAgent.enabled ? "GEMINI AGENT : ON" : "GEMINI AGENT : OFF";
+        toggleGeminiBtn.style.background = geminiAgent.enabled ? "#4285f4" : "#333";
+        toggleGeminiBtn.style.color = geminiAgent.enabled ? "#fff" : "#888";
+        logToTerminal(`Agent Gemini ${geminiAgent.enabled ? 'activé' : 'désactivé'}.`);
+        
+        // Cacher l'avatar si désactivé
+        const avatar = document.getElementById('gemini-agent-avatar');
+        if (avatar) avatar.setAttribute('visible', geminiAgent.enabled);
     });
 
     logToTerminal("Interface prête. En attente de génération.");
