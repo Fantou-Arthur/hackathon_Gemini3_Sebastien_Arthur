@@ -4,238 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebVR - Agent Monitoring</title>
-    <!-- Chargement de la librairie A-Frame via CDN -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <style>
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            overflow: hidden;
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            display: flex; overflow: hidden;
             font-family: 'Courier New', Courier, monospace;
         }
-
-        /* 70% de l'écran pour la scène VR */
-        #vr-container {
-            width: 70%;
-            height: 100%;
-            position: relative;
-        }
-
-        /* 30% de l'écran pour le terminal */
+        #vr-container { width: 70%; height: 100%; position: relative; }
         #terminal-container {
-            width: 30%;
-            height: 100%;
-            background-color: #000;
-            color: #0f0;
-            display: flex;
-            flex-direction: column;
+            width: 30%; height: 100%;
+            background-color: #000; color: #0f0;
+            display: flex; flexDirection: column;
             border-left: 2px solid #333;
         }
-
-        /* En-tête du terminal */
         #terminal-header {
-            padding: 15px;
-            text-align: center;
+            padding: 15px; text-align: center;
             border-bottom: 1px solid #0f0;
-            font-weight: bold;
-            font-size: 1.2em;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            font-weight: bold; font-size: 1.2em;
+            letter-spacing: 2px; text-transform: uppercase;
         }
-        
-        /* Panneau Architecte */
-        #architect-panel {
-            padding: 15px;
-            border-bottom: 1px solid #0f0;
-            background-color: #111;
-        }
-        
+        #architect-panel { padding: 15px; border-bottom: 1px solid #0f0; background-color: #111; }
         #promptInput {
-            width: 100%;
-            box-sizing: border-box;
-            background: #000;
-            color: #0f0;
-            border: 1px solid #333;
-            padding: 8px;
-            font-family: monospace;
-            resize: none;
+            width: 100%; box-sizing: border-box;
+            background: #000; color: #0f0;
+            border: 1px solid #333; padding: 8px;
+            font-family: monospace; resize: none;
             margin-bottom: 10px;
         }
-        
         #generateBtn {
-            width: 100%;
-            background: #0f0;
-            color: #000;
-            border: none;
-            padding: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            font-family: monospace;
-            text-transform: uppercase;
+            width: 100%; background: #0f0; color: #000;
+            border: none; padding: 10px;
+            font-weight: bold; cursor: pointer;
+            font-family: monospace; text-transform: uppercase;
         }
-        
-        #generateBtn:disabled {
-            background: #555;
-            color: #888;
-            cursor: not-allowed;
-        }
-
-        #status {
-            margin-top: 10px;
-            font-size: 0.85em;
-            color: #888;
-            text-align: center;
-        }
-
-        /* Zone scrollable pour les logs */
-        #agent-logs {
-            flex-grow: 1;
-            padding: 15px;
-            overflow-y: auto;
-            font-size: 0.9em;
-            line-height: 1.5;
-        }
-
-        .log-entry {
-            margin-bottom: 5px;
-            word-wrap: break-word;
-        }
-
-        .log-time {
-            color: #888;
-            margin-right: 10px;
-        }
-        
-        .log-highlight {
-            color: #fff;
-            font-weight: bold;
-        }
+        #generateBtn:disabled { background: #555; color: #888; cursor: not-allowed; }
+        #status { margin-top: 10px; font-size: 0.85em; color: #888; text-align: center; }
+        #agent-logs { flex-grow: 1; padding: 15px; overflow-y: auto; font-size: 0.9em; line-height: 1.5; }
+        .log-entry { margin-bottom: 5px; word-wrap: break-word; }
+        .log-time { color: #888; margin-right: 10px; }
+        .log-highlight { color: #fff; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- Partie Gauche : Scène 3D A-Frame -->
     <div id="vr-container">
         <a-scene embedded>
-            <!-- Environnement de base : Ciel et Sol -->
             <a-sky color="#1a1a1a"></a-sky> 
             <a-plane position="0 0 -4" rotation="-90 0 0" width="100" height="100" color="#333" material="roughness: 1;"></a-plane>
-            
-            <!-- Conteneur pour les éléments injectés dynamiquement -->
             <a-entity id="dynamic-world"></a-entity>
-
-            <!-- Caméra avec position initiale -->
-            <a-entity position="0 1.6 4">
-                <a-camera></a-camera>
-            </a-entity>
-            
-            <!-- Lumières -->
+            <a-entity position="0 1.6 4"><a-camera></a-camera></a-entity>
             <a-light type="ambient" color="#fff" intensity="0.5"></a-light>
             <a-light type="directional" color="#fff" intensity="0.7" position="-1 2 1"></a-light>
         </a-scene>
     </div>
 
-    <!-- Partie Droite : Terminal de commande -->
     <div id="terminal-container">
         <div id="terminal-header">Agent Logs</div>
-        
-        <!-- Panneau de génération IA -->
         <div id="architect-panel">
             <div style="margin-bottom: 8px; color: #fff; font-size: 0.9em;">Agent Architecte 3D</div>
-            <textarea id="promptInput" rows="3" placeholder="Ex: Crée une scène avec un bot rouge très agressif et deux murs bleus..."></textarea>
+            <textarea id="promptInput" rows="3" placeholder="Ex: Crée une scène..."></textarea>
             <button id="generateBtn">Générer le monde</button>
             <button id="toggleIABtn" style="margin-top: 5px; background: #333; color: #0f0; border: 1px solid #0f0; padding: 5px; width: 100%; font-family: monospace; cursor: pointer;">IA : ON</button>
-            <div id="status">En attente des instructions...</div>
+            <div id="status">Chargement du système...</div>
         </div>
-
         <div id="agent-logs">
-            <div class="log-entry"><span class="log-time">[SYS]</span> Initialisation de l'interface...</div>
+            <div class="log-entry"><span class="log-time">[SYS]</span> Initialisation des modules...</div>
         </div>
     </div>
 
-    <!-- Script Principal (Rendu 3D et utilitaires) -->
-    <script>
-        function logToTerminal(message) {
-            const logsContainer = document.getElementById('agent-logs');
-            const logEntry = document.createElement('div');
-            logEntry.className = 'log-entry';
-            
-            const now = new Date();
-            const timeStr = now.toISOString().split('T')[1].substring(0, 8);
-            
-            logEntry.innerHTML = `<span class="log-time">[${timeStr}]</span> ${message}`;
-            logsContainer.appendChild(logEntry);
-            
-            logsContainer.scrollTop = logsContainer.scrollHeight;
-        }
-
-        function renderWorld(json) {
-            logToTerminal("Construction spatiale en cours...");
-            const worldContainer = document.getElementById('dynamic-world');
-            
-            // Nettoyage
-            while (worldContainer.firstChild) {
-                worldContainer.removeChild(worldContainer.firstChild);
-            }
-
-            const createAFrameEntity = (item, entityType) => {
-                const el = document.createElement(item.shape || 'a-box'); // Fallback au cas où l'IA oublie la forme
-                
-                el.setAttribute('id', item.id);
-                el.setAttribute('color', item.color || '#FFFFFF');
-                
-                // Position
-                const positionString = `${item.x || 0} ${item.y || 1} ${item.z || -2}`;
-                el.setAttribute('position', positionString);
-
-                // Taille
-                if ((item.shape === 'a-sphere' || item.shape === 'a-cylinder') && item.radius) {
-                    el.setAttribute('radius', item.radius);
-                } 
-                if ((item.shape === 'a-cylinder' || item.shape === 'a-box') && item.height) {
-                    el.setAttribute('height', item.height);
-                }
-                if (item.shape === 'a-box') {
-                    if (item.width) el.setAttribute('width', item.width);
-                    if (item.depth) el.setAttribute('depth', item.depth);
-                }
-
-                worldContainer.appendChild(el);
-                logToTerminal(`-> <span class="log-highlight">${entityType}</span> : [${item.id}] @ (${positionString})`);
-            };
-
-            if (json.scene_3d && Array.isArray(json.scene_3d)) {
-                logToTerminal(`Génération de ${json.scene_3d.length} éléments statiques...`);
-                json.scene_3d.forEach(item => createAFrameEntity(item, 'Objet 3D'));
-            }
-
-            if (json.bots && Array.isArray(json.bots)) {
-                logToTerminal(`Déploiement de ${json.bots.length} entités mobiles...`);
-                json.bots.forEach(item => createAFrameEntity(item, 'Bot'));
-            }
-
-            logToTerminal("Environnement 3D prêt.");
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            logToTerminal("Système en attente de génération. Saisissez un prompt.");
-            
-            const toggleBtn = document.getElementById('toggleIABtn');
-            toggleBtn.addEventListener('click', () => {
-                isIAEnabled = !isIAEnabled;
-                toggleBtn.innerText = isIAEnabled ? "IA : ON" : "IA : OFF";
-                toggleBtn.style.color = isIAEnabled ? "#0f0" : "#f00";
-                toggleBtn.style.borderColor = isIAEnabled ? "#0f0" : "#f00";
-                logToTerminal(`IA ${isIAEnabled ? 'activée' : 'désactivée'}.`);
-            });
-        });
+    <!-- Chargement de l'application via le point d'entrée UI -->
+    <script type="module">
+        import { initUI } from './js/ui/main_ui.js';
+        window.addEventListener('DOMContentLoaded', initUI);
     </script>
-    
-    <!-- Scripts contenant la logique d'API LLM -->
-    <script src="architect.js"></script>
-    <script src="game_loop.js"></script>
 </body>
 </html>
