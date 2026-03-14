@@ -12,8 +12,6 @@ export function moveBot(bot, action) {
         case "MOVE_BACKWARD": bot.z += step; break;
         case "MOVE_LEFT": bot.x -= step; break;
         case "MOVE_RIGHT": bot.x += step; break;
-        case "STRAY_UP": bot.y += step; break;
-        case "STRAY_DOWN": bot.y = Math.max(0.5, bot.y - step); break;
     }
 
     updateDOMPosition(bot.id, bot.x, bot.y, bot.z);
