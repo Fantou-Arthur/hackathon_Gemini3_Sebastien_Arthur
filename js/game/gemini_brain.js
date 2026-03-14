@@ -25,9 +25,9 @@ class GeminiAgent {
         VISION : ${nearbyItems}
         
         INSTRUCTIONS : 
-        1. NAVIGATION : Dirige-toi vers un objet ou un NPC intéressant via une action parmi [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT].
-        2. SOCIAL : Si un NPC est à moins de 2m, tu peux lui parler directement.
-        3. PAROLE : Réagis à ce que tu vois ou adresse-toi à un bot (max 12 mots).
+        1. NAVIGATION : Si tu vois un objet ou un NPC, rapproche-toi. Sinon, EXPLORE AU HASARD [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT].
+        2. SOCIAL : Si un NPC est à moins de 2m, parle-lui.
+        3. PAROLE : Réagis ou explore (max 12 mots).
         
         JSON : { "action": "...", "speech": "..." }`;
 
@@ -84,10 +84,10 @@ class GeminiAgent {
 
     async chat(userMessage) {
         this.history.push(`Utilisateur: ${userMessage}`);
-        const prompt = `Contexte de vision : ${this.getNearbyContext()}.
-        L'utilisateur te dit : "${userMessage}".
-        Réponds brièvement en tant qu'agent Gemini.
-        JSON : { "speech": "..." }`;
+        const prompt = `Vision : ${this.getNearbyContext()}.
+        L'utilisateur te dit : "${userMessage}". Tu peux obéir à ses ordres de mouvement.
+        ACTIONS POSSIBLES : [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT].
+        JSON : { "action": "...", "speech": "..." }`;
 
         try {
             const data = await fetchGemini({
@@ -95,7 +95,12 @@ class GeminiAgent {
                 generationConfig: { responseMimeType: "application/json" }
             }, CONFIG.AGENT_MODEL);
             const response = JSON.parse(data.candidates[0].content.parts[0].text);
+            
             this.updateSpeechBubble(response.speech);
+            if (response.action && response.action !== "WAIT") {
+                moveBot(this, response.action);
+            }
+            
             this.history.push(`Gemini: ${response.speech}`);
             logToTerminal(`<span style="color: #4285f4; font-weight: bold;">Gemini :</span> ${response.speech}`);
         } catch (e) {
