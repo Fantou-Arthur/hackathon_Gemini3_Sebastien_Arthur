@@ -37,8 +37,8 @@ export function renderWorld(json, append = false) {
         logToTerminal(`-> <span class="log-highlight">${entityType}</span> : [${item.id}] shape:${item.shape}`);
     };
 
-    // Mise à jour de l'environnement si spécifié
-    if (json.environment_preset) {
+    // Mise à jour de l'environnement seulement si ce n'est pas un append
+    if (!append && json.environment_preset) {
         const env = document.querySelector('[environment]');
         if (env) {
             env.setAttribute('environment', `preset: ${json.environment_preset}; seed: 42; lighting: none; shadow: true`);

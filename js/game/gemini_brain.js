@@ -17,19 +17,23 @@ class GeminiAgent {
     async think(context) {
         if (!this.active || !this.enabled) return;
 
-        // Vision détaillée
+        // Vision spatiale détaillée (avec distances)
         const nearbyItems = this.getNearbyContext();
         
-        const prompt = `Tu es Gemini, un agent IA vivant en VR. 
-        POSITION : X:${this.x.toFixed(2)}, Y:${this.y.toFixed(2)}, Z:${this.z.toFixed(2)}.
-        CE QUE TU VOIS : ${nearbyItems}
-        HISTORIQUE CHAT : ${this.history.slice(-3).join(' | ')}
+        const prompt = `Tu es Gemini, un agent IA curieux. 
+        TA POSITION : X:${this.x.toFixed(1)}, Z:${this.z.toFixed(1)}.
+        VISION (objets proches avec direction relative) : 
+        ${nearbyItems}
         
         INSTRUCTIONS : 
-        1. MOUVEMENT : Choisis [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT]. **Varie tes directions pour explorer tout l'espace (X et Z).**
-        2. PAROLE : Réagis à un objet proche ou à l'utilisateur (max 10 mots).
+        1. NAVIGATION : Si un objet semble intéressant, déplace-toi vers lui.
+           - MOVE_FORWARD s'il est "Devant"
+           - MOVE_BACKWARD s'il est "Derrière"
+           - MOVE_LEFT s'il est à "Gauche"
+           - MOVE_RIGHT s'il est à "Droite"
+        2. PAROLE : Commente ce vers quoi tu te diriges (max 10 mots).
         
-        JSON : { "action": "...", "speech": "..." }`;
+        RÉPONDS UNIQUEMENT EN JSON : { "action": "...", "speech": "..." }`;
 
         try {
             const data = await fetchGemini({
@@ -48,11 +52,21 @@ class GeminiAgent {
 
     getNearbyContext() {
         const state = window.world_state || { scene_3d: [], bots: [] };
-        const items = [...(state.scene_3d || []), ...(state.bots || [])]
-            .map(i => `${i.id}(${i.shape}, ${i.color})`)
-            .slice(0, 5)
-            .join(', ');
-        return items || "Un espace vide et mystérieux.";
+        const allItems = [...(state.scene_3d || []), ...(state.bots || [])];
+        
+        const detailedItems = allItems.map(item => {
+            const dx = item.x - this.x;
+            const dz = item.z - this.z;
+            const dist = Math.sqrt(dx*dx + dz*dz);
+            
+            let dirH = dx > 0.5 ? "Droite" : (dx < -0.5 ? "Gauche" : "");
+            let dirV = dz > 0.5 ? "Derrière" : (dz < -0.5 ? "Devant" : "");
+            const direction = `${dirV} ${dirH}`.trim() || "Sur toi";
+
+            return `${item.id} (${direction}, dist: ${dist.toFixed(1)}m)`;
+        }).slice(0, 5).join(' | ');
+
+        return detailedItems || "Rien à l'horizon.";
     }
 
     updateSpeechBubble(text) {
