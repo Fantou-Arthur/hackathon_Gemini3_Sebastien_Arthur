@@ -17,17 +17,17 @@ class GeminiAgent {
     async think(context) {
         if (!this.active || !this.enabled) return;
 
-        // Vision détaillée
+        // Vision spatiale détaillée (avec distances)
         const nearbyItems = this.getNearbyContext();
         
-        const prompt = `Tu es Gemini, un agent IA vivant en VR. 
-        POSITION : X:${this.x.toFixed(2)}, Y:${this.y.toFixed(2)}, Z:${this.z.toFixed(2)}.
-        CE QUE TU VOIS : ${nearbyItems}
-        HISTORIQUE CHAT : ${this.history.slice(-3).join(' | ')}
+        const prompt = `Tu es Gemini, un agent IA curieux. 
+        TA POSITION : X:${this.x.toFixed(1)}, Z:${this.z.toFixed(1)}.
+        VISION : ${nearbyItems}
         
         INSTRUCTIONS : 
-        1. MOUVEMENT : Choisis [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT]. **Varie tes directions pour explorer tout l'espace (X et Z).**
-        2. PAROLE : Réagis à un objet proche ou à l'utilisateur (max 10 mots).
+        1. NAVIGATION : Si tu vois un objet ou un NPC, rapproche-toi. Sinon, EXPLORE AU HASARD [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT].
+        2. SOCIAL : Si un NPC est à moins de 2m, parle-lui.
+        3. PAROLE : Réagis ou explore (max 12 mots).
         
         JSON : { "action": "...", "speech": "..." }`;
 
@@ -40,6 +40,12 @@ class GeminiAgent {
             const response = JSON.parse(data.candidates[0].content.parts[0].text);
             this.updateSpeechBubble(response.speech);
             moveBot(this, response.action);
+            
+            // Synchronisation pour la Game Loop
+            if (window.world_state) {
+                window.world_state.gemini_agent = { x: this.x, z: this.z };
+            }
+
             logToTerminal(`<span style="color: #4285f4; font-weight: bold;">Gemini :</span> ${response.speech}`);
         } catch (e) {
             console.error("Gemini Brain Error:", e);
@@ -48,11 +54,21 @@ class GeminiAgent {
 
     getNearbyContext() {
         const state = window.world_state || { scene_3d: [], bots: [] };
-        const items = [...(state.scene_3d || []), ...(state.bots || [])]
-            .map(i => `${i.id}(${i.shape}, ${i.color})`)
-            .slice(0, 5)
-            .join(', ');
-        return items || "Un espace vide et mystérieux.";
+        const allItems = [...(state.scene_3d || []), ...(state.bots || [])];
+        
+        const detailedItems = allItems.map(item => {
+            const dx = item.x - this.x;
+            const dz = item.z - this.z;
+            const dist = Math.sqrt(dx*dx + dz*dz);
+            
+            let dirH = dx > 0.5 ? "Droite" : (dx < -0.5 ? "Gauche" : "");
+            let dirV = dz > 0.5 ? "Derrière" : (dz < -0.5 ? "Devant" : "");
+            const direction = `${dirV} ${dirH}`.trim() || "Sur toi";
+
+            return `${item.id} (${direction}, dist: ${dist.toFixed(1)}m)`;
+        }).slice(0, 5).join(' | ');
+
+        return detailedItems || "Rien à l'horizon.";
     }
 
     updateSpeechBubble(text) {
@@ -68,10 +84,10 @@ class GeminiAgent {
 
     async chat(userMessage) {
         this.history.push(`Utilisateur: ${userMessage}`);
-        const prompt = `Contexte de vision : ${this.getNearbyContext()}.
-        L'utilisateur te dit : "${userMessage}".
-        Réponds brièvement en tant qu'agent Gemini.
-        JSON : { "speech": "..." }`;
+        const prompt = `Vision : ${this.getNearbyContext()}.
+        L'utilisateur te dit : "${userMessage}". Tu peux obéir à ses ordres de mouvement.
+        ACTIONS POSSIBLES : [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT].
+        JSON : { "action": "...", "speech": "..." }`;
 
         try {
             const data = await fetchGemini({
@@ -79,7 +95,12 @@ class GeminiAgent {
                 generationConfig: { responseMimeType: "application/json" }
             }, CONFIG.AGENT_MODEL);
             const response = JSON.parse(data.candidates[0].content.parts[0].text);
+            
             this.updateSpeechBubble(response.speech);
+            if (response.action && response.action !== "WAIT") {
+                moveBot(this, response.action);
+            }
+            
             this.history.push(`Gemini: ${response.speech}`);
             logToTerminal(`<span style="color: #4285f4; font-weight: bold;">Gemini :</span> ${response.speech}`);
         } catch (e) {
