@@ -17,16 +17,19 @@ class GeminiAgent {
     async think(context) {
         if (!this.active || !this.enabled) return;
 
-        const prompt = `Tu es Gemini, un agent IA vivant dans ce monde VR. 
-        TON ÉTAT : Position X:${this.x.toFixed(2)}, Y:${this.y.toFixed(2)}, Z:${this.z.toFixed(2)}.
-        ENVIRONNEMENT PROCHE : ${context.nearbyObjects}
-        DERNIER MESSAGE UTILISATEUR : ${context.lastUserMessage || "Aucun"}
+        // Vision détaillée
+        const nearbyItems = this.getNearbyContext();
+        
+        const prompt = `Tu es Gemini, un agent IA vivant en VR. 
+        POSITION : X:${this.x.toFixed(2)}, Y:${this.y.toFixed(2)}, Z:${this.z.toFixed(2)}.
+        CE QUE TU VOIS : ${nearbyItems}
+        HISTORIQUE CHAT : ${this.history.slice(-3).join(' | ')}
         
         INSTRUCTIONS : 
-        1. Choisis un mouvement parmi [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT].
-        2. Rédige une courte phrase (max 10 mots) sur ce que tu vois ou fais.
+        1. MOUVEMENT : Choisis [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, STRAY_UP, STRAY_DOWN, WAIT].
+        2. PAROLE : Réagis à un objet proche ou à l'utilisateur (max 10 mots).
         
-        RÉPONDS UNIQUEMENT EN JSON : { "action": "...", "speech": "..." }`;
+        JSON : { "action": "...", "speech": "..." }`;
 
         try {
             const data = await fetchGemini({
@@ -43,12 +46,20 @@ class GeminiAgent {
         }
     }
 
+    getNearbyContext() {
+        const state = window.world_state || { scene_3d: [], bots: [] };
+        const items = [...(state.scene_3d || []), ...(state.bots || [])]
+            .map(i => `${i.id}(${i.shape}, ${i.color})`)
+            .slice(0, 5)
+            .join(', ');
+        return items || "Un espace vide et mystérieux.";
+    }
+
     updateSpeechBubble(text) {
         const bubble = document.getElementById('gemini-speech-bubble');
         if (bubble) {
             bubble.setAttribute('value', text);
             bubble.setAttribute('visible', 'true');
-            // Cache la bulle après 5 secondes
             setTimeout(() => {
                 if (bubble.getAttribute('value') === text) bubble.setAttribute('visible', 'false');
             }, 5000);
@@ -56,9 +67,11 @@ class GeminiAgent {
     }
 
     async chat(userMessage) {
-        const prompt = `L'utilisateur te parle : "${userMessage}".
-        Réponds de manière amicale et concise en tant qu'agent Gemini présent dans cette scène.
-        JSON : { "speech": "Ta réponse" }`;
+        this.history.push(`Utilisateur: ${userMessage}`);
+        const prompt = `Contexte de vision : ${this.getNearbyContext()}.
+        L'utilisateur te dit : "${userMessage}".
+        Réponds brièvement en tant qu'agent Gemini.
+        JSON : { "speech": "..." }`;
 
         try {
             const data = await fetchGemini({
@@ -67,6 +80,7 @@ class GeminiAgent {
             }, CONFIG.AGENT_MODEL);
             const response = JSON.parse(data.candidates[0].content.parts[0].text);
             this.updateSpeechBubble(response.speech);
+            this.history.push(`Gemini: ${response.speech}`);
             logToTerminal(`<span style="color: #4285f4; font-weight: bold;">Gemini :</span> ${response.speech}`);
         } catch (e) {
             logToTerminal("[ERREUR] Gemini ne peut pas répondre au chat.");
