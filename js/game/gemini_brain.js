@@ -25,7 +25,7 @@ class GeminiAgent {
         VISION : ${nearbyItems}
         
         INSTRUCTIONS : 
-        1. NAVIGATION : Dirige-toi vers un objet ou un NPC intéressant.
+        1. NAVIGATION : Dirige-toi vers un objet ou un NPC intéressant via une action parmi [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT].
         2. SOCIAL : Si un NPC est à moins de 2m, tu peux lui parler directement.
         3. PAROLE : Réagis à ce que tu vois ou adresse-toi à un bot (max 12 mots).
         
