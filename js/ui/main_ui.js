@@ -1,9 +1,18 @@
+import { getTerminalMarkup } from './components/terminal_ui.js';
+import { getVRSceneMarkup } from './components/vr_scene_ui.js';
 import { callArchitect } from '../services/architect.js';
 import { renderWorld } from '../renderer/world_renderer.js';
 import { startGameLoop, setIAEnabled, getIAEnabled } from '../game/game_loop.js';
 import { logToTerminal } from '../utils/logger.js';
 
 export function initUI() {
+    // Injection du markup modularisé
+    const vrContainer = document.getElementById('vr-container');
+    const terminalContainer = document.getElementById('terminal-container');
+    
+    if (vrContainer) vrContainer.innerHTML = getVRSceneMarkup();
+    if (terminalContainer) terminalContainer.innerHTML = getTerminalMarkup();
+
     const generateBtn = document.getElementById("generateBtn");
     const promptInput = document.getElementById("promptInput");
     const status = document.getElementById("status");
