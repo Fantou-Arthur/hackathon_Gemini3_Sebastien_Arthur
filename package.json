@@ -1,0 +1,14 @@
+{
+  "name": "webvr-project",
+  "version": "1.0.0",
+  "description": "Projet WebVR avec A-Frame et Gemini API",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "test-api": "node test_api.js",
+    "test-api2": "node test_api2.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

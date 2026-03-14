@@ -1,0 +1,6 @@
+node_modules/
+models_list.json
+models_list_clean.json
+test_model.js
+.DS_Store
+Thumbs.db
