@@ -43,12 +43,16 @@ async function runGameTick() {
             contextText += `- Bot [${bot.id}] en X:${Number(bot.x).toFixed(2)}, Y:${Number(bot.y).toFixed(2)}, Z:${Number(bot.z).toFixed(2)}. Règles: ${bot.rules || "Aléatoire"}.\n`;
         });
         
-        if (state.scene_3d) {
-            contextText += "OBSTACLES STATIQUES :\n";
-            state.scene_3d.forEach(obj => {
-                contextText += `- Objet [${obj.id}] en X:${Number(obj.x).toFixed(2)}, Y:${Number(obj.y).toFixed(2)}, Z:${Number(obj.z).toFixed(2)}.\n`;
-            });
+        if (window.world_state && window.world_state.gemini_agent) {
+             const ga = window.world_state.gemini_agent;
+             contextText += `\nAGENT GEMINI est en X:${Number(ga.x).toFixed(1)}, Z:${Number(ga.z).toFixed(1)}.\n`;
         }
+
+        const mainPrompt = `${contextText}\n
+        INSTRUCTION : Pour CHAQUE bot, choisis une action parmi [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT].
+        Si l'AGENT GEMINI est proche, tu peux ajouter un court message dans une propriété "speech".
+        RÉPONDS UNIQUEMENT avec un objet JSON : { "id_du_bot": { "action": "...", "speech": "..." }, ... }
+        NE RENVOIE RIEN D'AUTRE QUE LE JSON.`;
 
         const mainPrompt = `${contextText}\n
         INSTRUCTION : Pour CHAQUE bot listé ci-dessus, choisis une action parmi [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT].

@@ -22,18 +22,14 @@ class GeminiAgent {
         
         const prompt = `Tu es Gemini, un agent IA curieux. 
         TA POSITION : X:${this.x.toFixed(1)}, Z:${this.z.toFixed(1)}.
-        VISION (objets proches avec direction relative) : 
-        ${nearbyItems}
+        VISION : ${nearbyItems}
         
         INSTRUCTIONS : 
-        1. NAVIGATION : Si un objet semble intéressant, déplace-toi vers lui.
-           - MOVE_FORWARD s'il est "Devant"
-           - MOVE_BACKWARD s'il est "Derrière"
-           - MOVE_LEFT s'il est à "Gauche"
-           - MOVE_RIGHT s'il est à "Droite"
-        2. PAROLE : Commente ce vers quoi tu te diriges (max 10 mots).
+        1. NAVIGATION : Dirige-toi vers un objet ou un NPC intéressant.
+        2. SOCIAL : Si un NPC est à moins de 2m, tu peux lui parler directement.
+        3. PAROLE : Réagis à ce que tu vois ou adresse-toi à un bot (max 12 mots).
         
-        RÉPONDS UNIQUEMENT EN JSON : { "action": "...", "speech": "..." }`;
+        JSON : { "action": "...", "speech": "..." }`;
 
         try {
             const data = await fetchGemini({
@@ -44,6 +40,12 @@ class GeminiAgent {
             const response = JSON.parse(data.candidates[0].content.parts[0].text);
             this.updateSpeechBubble(response.speech);
             moveBot(this, response.action);
+            
+            // Synchronisation pour la Game Loop
+            if (window.world_state) {
+                window.world_state.gemini_agent = { x: this.x, z: this.z };
+            }
+
             logToTerminal(`<span style="color: #4285f4; font-weight: bold;">Gemini :</span> ${response.speech}`);
         } catch (e) {
             console.error("Gemini Brain Error:", e);
