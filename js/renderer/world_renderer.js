@@ -1,13 +1,15 @@
 import { logToTerminal } from '../utils/logger.js';
 
-export function renderWorld(json) {
-    logToTerminal("Construction spatiale en cours...");
+export function renderWorld(json, append = false) {
+    logToTerminal(append ? "Expansion spatiale en cours..." : "Construction spatiale en cours...");
     const worldContainer = document.getElementById('dynamic-world');
     if (!worldContainer) return;
 
-    // Nettoyage
-    while (worldContainer.firstChild) {
-        worldContainer.removeChild(worldContainer.firstChild);
+    // Nettoyage seulement si on ne fait pas un append
+    if (!append) {
+        while (worldContainer.firstChild) {
+            worldContainer.removeChild(worldContainer.firstChild);
+        }
     }
 
     const createAFrameEntity = (item, entityType) => {
@@ -58,7 +60,8 @@ export function renderWorld(json) {
 }
 
 export function updateDOMPosition(botId, newX, newY, newZ) {
-    const el = document.getElementById(botId);
+    const elId = (botId === 'gemini-agent') ? 'gemini-agent-avatar' : botId;
+    const el = document.getElementById(elId);
     if (el) {
         el.setAttribute('position', `${newX} ${newY} ${newZ}`);
     }
