@@ -26,7 +26,7 @@ class GeminiAgent {
         HISTORIQUE CHAT : ${this.history.slice(-3).join(' | ')}
         
         INSTRUCTIONS : 
-        1. MOUVEMENT : Choisis [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT].
+        1. MOUVEMENT : Choisis [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT]. **Varie tes directions pour explorer tout l'espace (X et Z).**
         2. PAROLE : Réagis à un objet proche ou à l'utilisateur (max 10 mots).
         
         JSON : { "action": "...", "speech": "..." }`;

@@ -125,5 +125,33 @@ export async function initUI() {
         if (avatar) avatar.setAttribute('visible', geminiAgent.enabled);
     });
 
+    // Gestion des NPCs
+    const npcList = document.getElementById("npc-list");
+    const resetBtn = document.getElementById("resetNPCsBtn");
+
+    const updateNPCList = () => {
+        if (!window.world_state || !window.world_state.bots) return;
+        npcList.innerHTML = window.world_state.bots.map(bot => `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 2px; border-bottom: 1px solid #222;">
+                <span>${bot.id}</span>
+                <span style="color: ${getIAEnabled() ? '#0f0' : '#f00'};">${getIAEnabled() ? 'Actif' : 'Fixé'}</span>
+            </div>
+        `).join('');
+    };
+
+    resetBtn.addEventListener('click', () => {
+        if (!window.world_state || !window.world_state.bots) return;
+        window.world_state.bots.forEach(bot => {
+            bot.x = bot.originX || bot.x;
+            bot.z = bot.originZ || bot.z;
+            const el = document.getElementById(bot.id);
+            if (el) el.setAttribute('position', `${bot.x} ${bot.y} ${bot.z}`);
+        });
+        logToTerminal("Positions des NPCs réinitialisées.");
+    });
+
+    // Mise à jour périodique de l'UI
+    setInterval(updateNPCList, 2000);
+
     logToTerminal("Interface prête. En attente de génération.");
 }
