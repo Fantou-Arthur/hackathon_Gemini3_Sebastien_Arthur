@@ -17,6 +17,7 @@ export async function callArchitect(userInput) {
     const payload = {
         contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
         generationConfig: { 
+            responseMimeType: "application/json",
             temperature: 0.2 
         }
     };
