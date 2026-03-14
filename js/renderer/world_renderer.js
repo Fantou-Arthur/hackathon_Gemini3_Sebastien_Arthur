@@ -16,25 +16,33 @@ export function renderWorld(json) {
         el.setAttribute('id', item.id);
         el.setAttribute('color', item.color || '#FFFFFF');
         el.setAttribute('shadow', 'cast: true; receive: true');
-        el.setAttribute('material', 'roughness: 0.7; metalness: 0.2');
+        el.setAttribute('material', 'roughness: 0.6; metalness: 0.3');
         
         const positionString = `${item.x || 0} ${item.y || 1} ${item.z || -2}`;
         el.setAttribute('position', positionString);
 
-        if ((item.shape === 'a-sphere' || item.shape === 'a-cylinder') && item.radius) {
-            el.setAttribute('radius', item.radius);
-        } 
-        if ((item.shape === 'a-cylinder' || item.shape === 'a-box') && item.height) {
-            el.setAttribute('height', item.height);
-        }
-        if (item.shape === 'a-box') {
-            if (item.width) el.setAttribute('width', item.width);
-            if (item.depth) el.setAttribute('depth', item.depth);
-        }
+        // Gestion dynamique des dimensions par primitive
+        if (item.radius) el.setAttribute('radius', item.radius);
+        if (item.radiusOuter) el.setAttribute('radius-outer', item.radiusOuter);
+        if (item.radiusInner) el.setAttribute('radius-inner', item.radiusInner);
+        if (item.radiusTubular) el.setAttribute('radius-tubular', item.radiusTubular);
+        if (item.height) el.setAttribute('height', item.height);
+        if (item.width) el.setAttribute('width', item.width);
+        if (item.depth) el.setAttribute('depth', item.depth);
+        if (item.segments) el.setAttribute('segments', item.segments);
 
         worldContainer.appendChild(el);
-        logToTerminal(`-> <span class="log-highlight">${entityType}</span> : [${item.id}] @ (${positionString})`);
+        logToTerminal(`-> <span class="log-highlight">${entityType}</span> : [${item.id}] shape:${item.shape}`);
     };
+
+    // Mise à jour de l'environnement si spécifié
+    if (json.environment_preset) {
+        const env = document.querySelector('[environment]');
+        if (env) {
+            env.setAttribute('environment', `preset: ${json.environment_preset}; seed: 42; lighting: none; shadow: true`);
+            logToTerminal(`Ambiance mise à jour : <span class="log-highlight">${json.environment_preset}</span>`);
+        }
+    }
 
     if (json.scene_3d && Array.isArray(json.scene_3d)) {
         logToTerminal(`Génération de ${json.scene_3d.length} éléments statiques...`);
