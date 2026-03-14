@@ -1,7 +1,8 @@
 import { CONFIG } from '../config.js';
 
-export async function fetchGemini(payload) {
-    const url = `${CONFIG.API_BASE_URL}/models/${CONFIG.MODEL_NAME}:generateContent?key=${CONFIG.API_KEY}`;
+export async function fetchGemini(payload, modelName = null) {
+    const model = modelName || CONFIG.ARCHITECT_MODEL;
+    const url = `${CONFIG.API_BASE_URL}/models/${model}:generateContent?key=${CONFIG.API_KEY}`;
     
     const response = await fetch(url, {
         method: "POST",

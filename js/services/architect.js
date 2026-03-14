@@ -1,16 +1,18 @@
 import { fetchGemini } from './gemini_api.js';
 import { logToTerminal } from '../utils/logger.js';
+import { CONFIG } from '../config.js';
 
 export async function callArchitect(userInput) {
-    const systemPrompt = `Tu es un Architecte 3D Expert en A-Frame. L'utilisateur va te demander de créer un décor.
-    RÈGLES STRICTES DE GÉNÉRATION :
-    1. Génère un JSON valide contenant 'scene_3d' (tableau d'objets statiques du décor) et 'bots' (tableau d'entités mobiles).
-    2. UTILISE DE GRANDES ÉCHELLES. Si on demande une "ville" ou un "bâtiment", génère des '<a-box>' ou '<a-cylinder>' massifs (ex: width: 10, height: 20, depth: 15).
-    3. Ajoute beaucoup de détails : crée de multiples objets en combinant des primitives A-Frame (sols colorés, routes, nombreux murs, piliers) pour former le décor demandé.
-    4. Éparpille les objets dans l'espace (positions X, Y, Z variées entre -30 et 30) pour remplir le champ de vision.
-    5. Pour chaque objet, fournis : id, shape (ex: 'a-box', 'a-sphere'), color (code Hex), x, y, z, et les dimensions requises (width/height/depth pour a-box, radius pour a-sphere).
-    6. Pour les 'bots', ajoute aussi une propriété 'rules' contenant un petit trait de personnalité. Les actions autorisées dans 'rules' sont [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT].
-    7. NE RENVOIE QUE LE CODE JSON VALIDE, SANS AUCUN TEXTE AVANT NI APRÈS.`;
+    const systemPrompt = `Tu es un Architecte 3D Expert en A-Frame. L'utilisateur va te demander de créer ou d'ajouter des éléments au décor.
+    RÈGLES D'EXCELLENCE VISUELLE ET COMPOSITION :
+    1. SCULPTURE D'ENTITÉS (ANIMAUX/NPCs) : Si on te demande des entités vivantes (ex: vaches, humains), NE POSE PAS un seul bloc. SCULPTE-LES avec plusieurs primitives. 
+       Ex pour une vache : 1 boîte large (corps), 1 boîte plus petite (tête), 4 cylindres fins (pattes), 2 cônes (cornes).
+    2. FORMES AUTORISÉES : [a-box, a-sphere, a-cylinder, a-cone, a-torus, a-octahedron, a-tetrahedron, a-dodecahedron].
+    3. PALETTES PREMIUN : Utilise des codes Hex élégants. Ex: #5D4037 (Dark Brown pour vaches), #F5F5DC (Beige), #BDBDBD (Gris).
+    4. COORDINATION DU SOL : Propriété "environment_preset" au premier niveau (presets : [forest, volcano, desert, osiris, dream, tron, contact, egypt]).
+    5. FORMAT JSON : Renvoie un objet { "environment_preset": "...", "scene_3d": [...], "bots": [...] }.
+    6. Pour chaque objet : id, shape, color, x, y, z, et dimensions. Attention à la cohérence des positions Y pour que les objets ne flottent pas.
+    7. NE RENVOIE QUE LE CODE JSON VALIDE.`;
 
     const fullPrompt = `INSTRUCTION SYSTÈME STRICTE : ${systemPrompt}\n\nDEMANDE UTILISATEUR : ${userInput}`;
 
@@ -24,7 +26,7 @@ export async function callArchitect(userInput) {
 
     try {
         logToTerminal("L'Architecte analyse la demande...");
-        const data = await fetchGemini(payload);
+        const data = await fetchGemini(payload, CONFIG.ARCHITECT_MODEL);
         
         let jsonString = data.candidates[0].content.parts[0].text;
         jsonString = jsonString.replace(/```json/g, "").replace(/```/g, "").trim();

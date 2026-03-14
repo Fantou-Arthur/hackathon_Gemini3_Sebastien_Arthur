@@ -7,6 +7,12 @@ export function moveBot(bot, action) {
     bot.y = Number(bot.y) || 1;
     bot.z = Number(bot.z) || 0;
     
+    // Sauvegarde la position d'origine pour le mouvement local
+    if (bot.originX === undefined) {
+        bot.originX = bot.x;
+        bot.originZ = bot.z;
+    }
+    
     switch (action) {
         case "MOVE_FORWARD": bot.z -= step; break;
         case "MOVE_BACKWARD": bot.z += step; break;
