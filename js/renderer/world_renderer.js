@@ -15,6 +15,8 @@ export function renderWorld(json) {
         
         el.setAttribute('id', item.id);
         el.setAttribute('color', item.color || '#FFFFFF');
+        el.setAttribute('shadow', 'cast: true; receive: true');
+        el.setAttribute('material', 'roughness: 0.7; metalness: 0.2');
         
         const positionString = `${item.x || 0} ${item.y || 1} ${item.z || -2}`;
         el.setAttribute('position', positionString);
