@@ -58,7 +58,10 @@ async function runGameTick() {
 
         const payload = {
             contents: [{ role: "user", parts: [{ text: mainPrompt }] }],
-            generationConfig: { responseMimeType: "application/json" }
+            generationConfig: { 
+                responseMimeType: "application/json",
+                temperature: 0.1 
+            }
         };
 
         let botActions = {};

@@ -3,14 +3,15 @@ import { logToTerminal } from '../utils/logger.js';
 
 export async function callArchitect(userInput) {
     const systemPrompt = `Tu es un Architecte 3D Expert en A-Frame. L'utilisateur va te demander de créer un décor.
-    RÈGLES STRICTES DE GÉNÉRATION :
-    1. Génère un JSON valide contenant 'scene_3d' (tableau d'objets statiques du décor) et 'bots' (tableau d'entités mobiles).
-    2. UTILISE DE GRANDES ÉCHELLES. Si on demande une "ville" ou un "bâtiment", génère des '<a-box>' ou '<a-cylinder>' massifs (ex: width: 10, height: 20, depth: 15).
-    3. Ajoute beaucoup de détails : crée de multiples objets en combinant des primitives A-Frame (sols colorés, routes, nombreux murs, piliers) pour former le décor demandé.
-    4. Éparpille les objets dans l'espace (positions X, Y, Z variées entre -30 et 30) pour remplir le champ de vision.
-    5. Pour chaque objet, fournis : id, shape (ex: 'a-box', 'a-sphere'), color (code Hex), x, y, z, et les dimensions requises (width/height/depth pour a-box, radius pour a-sphere).
-    6. Pour les 'bots', ajoute aussi une propriété 'rules' contenant un petit trait de personnalité. Les actions autorisées dans 'rules' sont [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT].
-    7. NE RENVOIE QUE LE CODE JSON VALIDE, SANS AUCUN TEXTE AVANT NI APRÈS.`;
+    RÈGLES D'EXCELLENCE VISUELLE :
+    1. GÉNÉRATION DE STRUCTURES COMPLEXES : Ne place pas juste des blocs. Compose des ensembles. Ex: Pour un pilier, utilise un cylindre central avec une base octogonale et un sommet en tore.
+    2. FORMES AUTORISÉES : [a-box, a-sphere, a-cylinder, a-cone, a-torus, a-octahedron, a-tetrahedron].
+    3. PALETTES DE COULEURS "PREMIUM" : Utilise des codes Hex élégants. Ex: #2c3e50 (Midnight Blue), #ecf0f1 (Clouds), #d4af37 (Gold), #c0c0c0 (Silver). Évite les couleurs ultra-saturées.
+    4. VARIÉTÉ DE TAILLE : Mélange des structures gigantesques (décors de fond, murs) et des petits détails (ornements, éclairages au sol).
+    5. COORDINATION DU SOL : Dans ton JSON, ajoute une propriété "environment_preset" au premier niveau qui correspond au thème (presets : [forest, volcano, desert, osiris, dream, tron, contact, egypt]).
+    6. FORMAT JSON : Renvoie un objet { "environment_preset": "...", "scene_3d": [...], "bots": [...] }.
+    7. Pour chaque objet : id, shape, color, x, y, z, et dimensions spécifiques (radius, radius-tubular pour torus, etc.).
+    8. NE RENVOIE QUE LE CODE JSON VALIDE.`;
 
     const fullPrompt = `INSTRUCTION SYSTÈME STRICTE : ${systemPrompt}\n\nDEMANDE UTILISATEUR : ${userInput}`;
 

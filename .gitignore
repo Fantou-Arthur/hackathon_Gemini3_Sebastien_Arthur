@@ -1,3 +1,4 @@
+.env
 node_modules/
 models_list.json
 models_list_clean.json
