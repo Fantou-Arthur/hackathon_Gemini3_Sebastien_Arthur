@@ -50,14 +50,8 @@ async function runGameTick() {
 
         const mainPrompt = `${contextText}\n
         INSTRUCTION : Pour CHAQUE bot, choisis une action parmi [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT].
-        Si l'AGENT GEMINI est proche, tu peux ajouter un court message dans une propriété "speech".
+        Si l'AGENT GEMINI est proche, tu peux ajouter un court message dans une propriété "speech" pour lui parler.
         RÉPONDS UNIQUEMENT avec un objet JSON : { "id_du_bot": { "action": "...", "speech": "..." }, ... }
-        NE RENVOIE RIEN D'AUTRE QUE LE JSON.`;
-
-        const mainPrompt = `${contextText}\n
-        INSTRUCTION : Pour CHAQUE bot listé ci-dessus, choisis une action parmi [MOVE_FORWARD, MOVE_BACKWARD, MOVE_LEFT, MOVE_RIGHT, WAIT].
-        RÉPONDS UNIQUEMENT avec un objet JSON valide où la clé est l'ID du bot et la valeur est l'action choisie.
-        Exemple : { "bot1": "MOVE_FORWARD", "bot2": "WAIT" }
         NE RENVOIE RIEN D'AUTRE QUE LE JSON.`;
 
         const payload = {
