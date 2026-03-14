@@ -9,6 +9,10 @@ export function getTerminalMarkup() {
             <button id="toggleIABtn" style="margin-top: 5px; background: #333; color: #0f0; border: 1px solid #0f0; padding: 5px; width: 100%; font-family: monospace; cursor: pointer;">IA : ON</button>
             <div id="status">Chargement du système...</div>
         </div>
+        <div id="gemini-chat-panel" style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">
+            <div style="color: #4285f4; font-size: 0.9em; font-weight: bold; margin-bottom: 5px;">Chat avec Gemini</div>
+            <input id="chatInput" type="text" placeholder="Dis quelque chose..." style="width: 100%; background: #222; border: 1px solid #4285f4; color: #fff; padding: 5px; font-family: monospace;">
+        </div>
         <div id="agent-logs">
             <div class="log-entry"><span class="log-time">[SYS]</span> Initialisation des modules...</div>
         </div>

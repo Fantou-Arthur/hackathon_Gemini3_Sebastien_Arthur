@@ -60,7 +60,8 @@ export function renderWorld(json, append = false) {
 }
 
 export function updateDOMPosition(botId, newX, newY, newZ) {
-    const el = document.getElementById(botId);
+    const elId = (botId === 'gemini-agent') ? 'gemini-agent-avatar' : botId;
+    const el = document.getElementById(elId);
     if (el) {
         el.setAttribute('position', `${newX} ${newY} ${newZ}`);
     }

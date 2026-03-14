@@ -71,7 +71,35 @@ export async function initUI() {
         }
     };
 
-    generateBtn.addEventListener("click", () => handleGeneration(false));
+    const chatInput = document.getElementById("chatInput");
+    
+    // Initialisation Gemini Agent
+    const { geminiAgent } = await import('../game/gemini_brain.js');
+
+    chatInput.addEventListener("keydown", async (e) => {
+        if (e.key === "Enter") {
+            const msg = chatInput.value;
+            chatInput.value = "";
+            logToTerminal(`<span style="color: #aaa;">Vous :</span> ${msg}`);
+            await geminiAgent.chat(msg);
+        }
+    });
+
+    // Boucle de pensée autonome (chaque seconde)
+    setInterval(() => {
+        if (getIAEnabled() && geminiAgent.active) {
+            const context = {
+                nearbyObjects: window.world_state?.scene_3d?.length || 0,
+                lastUserMessage: "" // Améliorable plus tard
+            };
+            geminiAgent.think(context);
+        }
+    }, 1000);
+
+    generateBtn.addEventListener("click", () => {
+        geminiAgent.active = true;
+        handleGeneration(false);
+    });
     addBtn.addEventListener("click", () => handleGeneration(true));
 
     toggleIABtn.addEventListener('click', () => {
