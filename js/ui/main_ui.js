@@ -115,9 +115,9 @@ export async function initUI() {
 
     toggleGeminiBtn.addEventListener('click', () => {
         geminiAgent.enabled = !geminiAgent.enabled;
-        toggleGeminiBtn.innerText = geminiAgent.enabled ? "GEMINI AGENT : ON" : "GEMINI AGENT : OFF";
-        toggleGeminiBtn.style.background = geminiAgent.enabled ? "#4285f4" : "#333";
-        toggleGeminiBtn.style.color = geminiAgent.enabled ? "#fff" : "#888";
+        toggleGeminiBtn.innerText = "GEMINI AGENT : OFF";
+        toggleGeminiBtn.style.background = "#333";
+        toggleGeminiBtn.style.color = "#888";
         logToTerminal(`Agent Gemini ${geminiAgent.enabled ? 'activé' : 'désactivé'}.`);
         
         // Cacher l'avatar si désactivé

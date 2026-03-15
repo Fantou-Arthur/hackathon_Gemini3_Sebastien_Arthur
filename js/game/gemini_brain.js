@@ -10,7 +10,7 @@ class GeminiAgent {
         this.y = 1.6;
         this.z = 2;
         this.active = false;      // Liaison à la génération du monde
-        this.enabled = true;      // Interrupteur manuel utilisateur
+        this.enabled = false;     // Interrupteur manuel utilisateur (désactivé par défaut)
         this.history = [];
     }
 
