@@ -1,6 +1,6 @@
 export async function loadEnv() {
     try {
-        const response = await fetch('/.env');
+        const response = await fetch(`/.env?t=${Date.now()}`);
         const text = await response.text();
         const env = {};
         
