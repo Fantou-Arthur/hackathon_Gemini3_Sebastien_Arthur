@@ -2,6 +2,7 @@ The goal of the project is to generate 3D synthetic worlds to train World models
 In addition we want these world models to learn how to discriminate between ethical and non ethical actions and interactions
 To do so we learn a latent representation of the synthetic 3D actions and interactions, and train the discriminator on this latent representation.
 
+Link to the youtube demo : https://youtu.be/hX3bPb6hZdc
 
 # 🌌 Gemini WebVR - World Architect & Interactive Agent
 
