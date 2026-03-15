@@ -104,6 +104,10 @@ export async function initUI() {
 
     const toggleGeminiBtn = document.getElementById('toggleGeminiBtn');
 
+    toggleGeminiBtn.innerText = "GEMINI AGENT : OFF";
+    toggleGeminiBtn.style.background = "#333";
+    toggleGeminiBtn.style.color = "#888";
+
     toggleIABtn.addEventListener('click', () => {
         const newState = !getIAEnabled();
         setIAEnabled(newState);
